@@ -2,28 +2,27 @@ package com.mettl.loyalty.domain.dto;
 
 import java.util.Date;
 
-import com.mettl.loyalty.utils.StringUtils;
-
 public class TransactionDTO {
 
 	private Long transactionId;
 	private Date purchaseDate;
 	private double purchaseAmount;
-	private String loyalityCardNumber = StringUtils.BLANK;
-	private String userName = StringUtils.BLANK;
-	private String userEmail = StringUtils.BLANK;
-	
-	public TransactionDTO(Long transactionId, Date purchaseDate, double purchaseAmount) {
+	private Long loyalityCardNumber;
+	private String userName;
+	private String userEmail;
+
+	public TransactionDTO(Long transactionId, Date purchaseDate,
+			double purchaseAmount) {
 		this.transactionId = transactionId;
 		this.purchaseDate = purchaseDate;
 		this.purchaseAmount = purchaseAmount;
 	}
 
-	public String getLoyalityCardNumber() {
+	public Long getLoyalityCardNumber() {
 		return loyalityCardNumber;
 	}
 
-	public void setLoyalityCardNumber(String loyalityCardNumber) {
+	public void setLoyalityCardNumber(Long loyalityCardNumber) {
 		this.loyalityCardNumber = loyalityCardNumber;
 	}
 

@@ -2,19 +2,36 @@ package com.mettl.loyalty.domain;
 
 import java.util.Date;
 
+import com.mettl.loyalty.exception.LoyaltyProgramException;
+
 public class Transaction {
 
-	private Long id;
+	private Long transactionId;
 	private Date purchaseDate;
-	private double amount = 0.0;
+	private double purchaseAmount = 0.0;
 	private int pointsEarned;
 
-	public Long getId() {
-		return id;
+	public Transaction(Long transactionId) throws LoyaltyProgramException {
+		if(transactionId == null){
+			throw new LoyaltyProgramException("Transaction Id cannot be null");
+		}
+		this.transactionId = transactionId;
+	}
+	
+	public Transaction(Long transactionId, Date purchaseDate,
+			double purchaseAmount, int loyaltyPoints) {
+		this.transactionId = transactionId;
+		this.purchaseDate = purchaseDate;
+		this.purchaseAmount = purchaseAmount;
+		this.pointsEarned = loyaltyPoints;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public Long getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(Long transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	public Date getPurchaseDate() {
@@ -25,12 +42,12 @@ public class Transaction {
 		this.purchaseDate = purchaseDate;
 	}
 
-	public double getAmount() {
-		return amount;
+	public double getPurchaseAmount() {
+		return purchaseAmount;
 	}
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setPurchaseAmount(double purchaseAmount) {
+		this.purchaseAmount = purchaseAmount;
 	}
 
 	public int getPointsEarned() {
@@ -43,8 +60,22 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		return "Transaction [id=" + id + ", purchaseDate=" + purchaseDate
-				+ ", amount=" + amount + ", pointsEarned=" + pointsEarned + "]";
+		return "Transaction [transactionId=" + transactionId
+				+ ", purchaseDate=" + purchaseDate + ", purchaseAmount="
+				+ purchaseAmount + ", pointsEarned=" + pointsEarned + "]";
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Transaction && this.transactionId != null && this.transactionId.equals(((Transaction) obj).getTransactionId())){
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.transactionId.hashCode();
+	}
+	
 }
