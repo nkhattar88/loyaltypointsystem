@@ -5,13 +5,12 @@ import java.util.TreeSet;
 
 import com.mettl.loyalty.comparator.TransactionDateComparator;
 import com.mettl.loyalty.exception.LoyaltyProgramException;
-import com.mettl.loyalty.utils.StringUtils;
+import com.mettl.loyalty.util.LoyaltyProgramConstants;
 
 public class Customer {
 
-	private static final int DEFAULT_LOYALTY_POINTS = 100;
-	private String name = StringUtils.BLANK;
-	private String email = StringUtils.BLANK;
+	private String name;
+	private String email;
 	private LoyaltyType loyaltyType;
 	private Long loyaltyCardNumber;
 	private int loyaltyPoints;
@@ -76,7 +75,7 @@ public class Customer {
 	}
 
 	private void addDefaultPoints() {
-		loyaltyPoints += DEFAULT_LOYALTY_POINTS;
+		loyaltyPoints += LoyaltyProgramConstants.NEW_CUSTOMER_LOYALTY_POINTS;
 	}
 
 	public Set<Transaction> getTransactions() {

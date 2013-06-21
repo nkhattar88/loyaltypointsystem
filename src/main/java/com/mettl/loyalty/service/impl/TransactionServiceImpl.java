@@ -50,22 +50,23 @@ public class TransactionServiceImpl implements TransactionService{
 				}
 				
 				double purchaseAmount = transactionDTO.getPurchaseAmount();
-				LoyaltyType loyaltyType = loyaltyProgramService.computeBySpending(customer.getCurrentYearTotal() + purchaseAmount);
-				
+				LoyaltyType loyaltyType = loyaltyProgramService.computeLoyaltyTypeBySpending(customer.getCurrentYearTotal() + purchaseAmount);
 				Transaction transaction = createTransaction(loyaltyCardNumber, loyaltyType, transactionDTO);
 				if(transaction == null){
 					continue;
 				}
 				LOGGER.info("New Transaction with Id :"+transaction.getTransactionId()+" added to Customer with Loyalty Card Number"+loyaltyCardNumber);
-				customer.setLoyaltyType(loyaltyType);
-				updateCustomerInfo(transactionDTO, customer);
+				updateCustomerInfo(customer, transactionDTO, loyaltyType);
 			} catch (Exception e) {
 				LOGGER.error("Exception occurred while processing transaction:"+transactionDTO+". Stacktrace : "+e);
 			}
 		}
 	}
 
-	private void updateCustomerInfo(TransactionDTO transactionDTO, Customer customer) {
+	private void updateCustomerInfo(Customer customer, TransactionDTO transactionDTO, LoyaltyType loyaltyType) {
+		if(loyaltyType != null){
+			customer.setLoyaltyType(loyaltyType);
+		}
 		if(StringUtils.isNotBlank(transactionDTO.getUserName())){
 			customer.setName(transactionDTO.getUserName());
 		}
@@ -74,8 +75,8 @@ public class TransactionServiceImpl implements TransactionService{
 		}
 	}
 	
-	private Transaction createTransaction(Long loyaltyCardNumber, LoyaltyType loyaltyType, TransactionDTO transactionDTO){
-		int loyaltyPoints = loyaltyProgramService.computeLoyaltyPointsByLoyaltyTypeAndSpending(loyaltyType, transactionDTO.getPurchaseAmount());
+	private Transaction createTransaction(Long loyaltyCardNumber, LoyaltyType loyaltyType, TransactionDTO transactionDTO) throws LoyaltyProgramException{
+		int loyaltyPoints = loyaltyType != null ? loyaltyProgramService.computeLoyaltyPointsByLoyaltyTypeAndSpending(loyaltyType, transactionDTO.getPurchaseAmount()):0;
 		Transaction transaction = new Transaction(transactionDTO.getTransactionId(),transactionDTO.getPurchaseDate(),transactionDTO.getPurchaseAmount(),loyaltyPoints);
 		if(!customerService.addTransaction(loyaltyCardNumber,transaction)){
 			return null;

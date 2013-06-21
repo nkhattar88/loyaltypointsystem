@@ -7,14 +7,7 @@ import com.mettl.loyalty.domain.LoyaltyType;
 
 public class LoyaltyProgramService {
 	
-	public int computeLoyaltyPointsByLoyaltyTypeAndSpending(LoyaltyType loyaltyType, double purchaseAmount){
-		if(loyaltyType.getPurchaseFactor() != 0){
-			return loyaltyType.getPointFactor() * (int)(purchaseAmount/loyaltyType.getPurchaseFactor());
-		}
-		return 0;
-	}
-	
-	public LoyaltyType computeBySpending(double spending){
+	public LoyaltyType computeLoyaltyTypeBySpending(double spending){
 		LoyaltyType type = null;
 		LoyaltyType[] values = LoyaltyType.values();
 		Arrays.sort(values, new LoyaltyLimitComparator());
@@ -26,4 +19,12 @@ public class LoyaltyProgramService {
 		}
 		return type;
 	}
+	
+	public int computeLoyaltyPointsByLoyaltyTypeAndSpending(LoyaltyType loyaltyType, double purchaseAmount){
+		if(loyaltyType.getPurchaseFactor() != 0){
+			return loyaltyType.getPointFactor() * (int)(purchaseAmount/loyaltyType.getPurchaseFactor());
+		}
+		return 0;
+	}
+	
 }

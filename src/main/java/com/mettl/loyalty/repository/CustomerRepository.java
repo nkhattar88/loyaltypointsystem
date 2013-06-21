@@ -24,16 +24,17 @@ public class CustomerRepository {
 	}
 
 	public boolean addCustomer(Customer customer) {
+		if(customers.contains(customer)){
+			return false;
+		}
 		return customers.add(customer);
 	}
 
-	public boolean addTransaction(Long loyaltyCardNumber,
-			Transaction transaction) throws LoyaltyProgramException {
+	public boolean addTransaction(Long loyaltyCardNumber, Transaction transaction) throws LoyaltyProgramException {
 		Customer customer = findByLoyaltyCardNumber(loyaltyCardNumber);
-		if(customer == null){
+		if(customer == null || !customer.getTransactions().add(transaction)){
 			return false;
 		}
-		customer.getTransactions().add(transaction);
 		customer.setLoyaltyPoints(customer.getLoyaltyPoints() + transaction.getPointsEarned());
 		customer.setCurrentYearTotal(customer.getCurrentYearTotal() + transaction.getPurchaseAmount());
 		return true;

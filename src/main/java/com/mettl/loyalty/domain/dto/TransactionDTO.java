@@ -22,8 +22,8 @@ public class TransactionDTO {
 		return loyalityCardNumber;
 	}
 
-	public void setLoyalityCardNumber(Long loyalityCardNumber) {
-		this.loyalityCardNumber = loyalityCardNumber;
+	public void setLoyalityCardNumber(Long loyaltyCardNumber) {
+		this.loyalityCardNumber = loyaltyCardNumber;
 	}
 
 	public String getUserName() {

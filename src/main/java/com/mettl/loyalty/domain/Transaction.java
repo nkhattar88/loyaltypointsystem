@@ -11,15 +11,15 @@ public class Transaction {
 	private double purchaseAmount = 0.0;
 	private int pointsEarned;
 
-	public Transaction(Long transactionId) throws LoyaltyProgramException {
-		if(transactionId == null){
-			throw new LoyaltyProgramException("Transaction Id cannot be null");
-		}
+	public Transaction(Long transactionId, Date purchaseDate, double purchaseAmount) throws LoyaltyProgramException {
+		throwErrorIfTransactionInformationIsNull(transactionId, purchaseDate, purchaseAmount);
 		this.transactionId = transactionId;
+		this.purchaseDate = purchaseDate;
+		this.purchaseAmount = purchaseAmount;
 	}
 	
-	public Transaction(Long transactionId, Date purchaseDate,
-			double purchaseAmount, int loyaltyPoints) {
+	public Transaction(Long transactionId, Date purchaseDate, double purchaseAmount, int loyaltyPoints) throws LoyaltyProgramException {
+		throwErrorIfTransactionInformationIsNull(transactionId, purchaseDate, purchaseAmount);
 		this.transactionId = transactionId;
 		this.purchaseDate = purchaseDate;
 		this.purchaseAmount = purchaseAmount;
@@ -76,6 +76,12 @@ public class Transaction {
 	@Override
 	public int hashCode() {
 		return this.transactionId.hashCode();
+	}
+	
+	private void throwErrorIfTransactionInformationIsNull(Long transactionId, Date purchaseDate, double purchaseAmount) throws LoyaltyProgramException{
+		if(transactionId == null || purchaseDate == null || purchaseAmount < 0){
+			throw new LoyaltyProgramException("Transaction Id & Purchase Date cannot be null and Purchase Amount cannot be negative");
+		}
 	}
 	
 }
