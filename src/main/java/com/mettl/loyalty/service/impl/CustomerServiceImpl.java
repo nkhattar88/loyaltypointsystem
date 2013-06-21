@@ -18,26 +18,6 @@ public class CustomerServiceImpl implements CustomerService{
 		this.customerRepository = customerRepository;
 	}
 
-	public Customer findByLoyaltyCardNumber(Long loyaltyCardNumber){
-		if(loyaltyCardNumber == null){
-			return null;
-		}
-		try {
-			return customerRepository.findByLoyaltyCardNumber(loyaltyCardNumber);
-		} catch (LoyaltyProgramException e) {
-			LOGGER.error(e);
-			return null;
-		}
-	}
-	
-	public boolean addNewCustomer(Customer customer){
-		if(customer == null){
-			LOGGER.error("Cannot Save a null object of Customer");
-			return false;
-		}
-		return customerRepository.addCustomer(customer);
-	}
-	
 	public boolean addTransaction(Long custLoyaltyCardNumber, Transaction transaction) {
 		if(custLoyaltyCardNumber == null){
 			LOGGER.error("Cannot add a object of Transaction to Customer with null Loyalty Card Number");
@@ -52,6 +32,30 @@ public class CustomerServiceImpl implements CustomerService{
 		} catch (LoyaltyProgramException e) {
 			LOGGER.error(e);
 			return false;
+		}
+	}
+	
+	public Customer fetchCustomerByLoyalityCardNumber(Long loyaltyCardNumber) throws LoyaltyProgramException{
+		Customer customer = findByLoyaltyCardNumber(loyaltyCardNumber);
+		if(customer == null){
+			customer = new Customer(loyaltyCardNumber);
+			if(!customerRepository.addCustomer(customer)){
+				return null;
+			}
+			LOGGER.info("New Customer added with Loyalty Card Number"+loyaltyCardNumber);
+		}
+		return customer;
+	}
+	
+	private Customer findByLoyaltyCardNumber(Long loyaltyCardNumber){
+		if(loyaltyCardNumber == null){
+			return null;
+		}
+		try {
+			return customerRepository.findByLoyaltyCardNumber(loyaltyCardNumber);
+		} catch (LoyaltyProgramException e) {
+			LOGGER.error(e);
+			return null;
 		}
 	}
 }

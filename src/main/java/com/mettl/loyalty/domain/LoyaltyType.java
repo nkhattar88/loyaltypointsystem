@@ -1,8 +1,5 @@
 package com.mettl.loyalty.domain;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 public enum LoyaltyType {
 	
 	GOLD(25,500,50000), SILVER(2,100,25000), NORMAL(1,100,0);
@@ -28,25 +25,5 @@ public enum LoyaltyType {
 
 	public double getMinLimit() {
 		return minLimit;
-	}
-	
-	public static LoyaltyType computeBySpending(double spending){
-		LoyaltyType type = null;
-		LoyaltyType[] values = LoyaltyType.values();
-		Arrays.sort(values, new LoyaltyLimitComparator());
-		for(LoyaltyType loyaltyType : values){
-			if(spending > loyaltyType.getMinLimit()){
-				type = loyaltyType;	
-			}
-		}
-		return type;
-	}
-	
-	private static class LoyaltyLimitComparator implements Comparator<LoyaltyType>{
-
-		public int compare(LoyaltyType o1, LoyaltyType o2) {
-			return o1.getMinLimit() > o2.getMinLimit() ? 1:-1;
-		}
-		
 	}
 }

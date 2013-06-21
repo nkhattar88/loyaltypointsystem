@@ -43,35 +43,44 @@ public class TransactionServiceImpl implements TransactionService{
 					LOGGER.error("No LoyaltyCardNumber found for Transaction with Id:"+transactionDTO.getTransactionId());
 					continue;
 				}
-				Customer customer = customerService.findByLoyaltyCardNumber(loyaltyCardNumber);
+				Customer customer = customerService.fetchCustomerByLoyalityCardNumber(loyaltyCardNumber);
 				if(customer == null){
-					customer = new Customer(loyaltyCardNumber);
-					if(!customerService.addNewCustomer(customer)){
-						continue;
-					}
-					LOGGER.info("New Customer added with Loyalty Card Number"+loyaltyCardNumber);
+					LOGGER.error("No Customer fetched with LoyalityCardNumber:"+loyaltyCardNumber);
+					continue;
 				}
 				
 				double purchaseAmount = transactionDTO.getPurchaseAmount();
-				LoyaltyType loyaltyType = LoyaltyType.computeBySpending(customer.getCurrentYearTotal() + purchaseAmount);
-				int loyaltyPoints = loyaltyProgramService.computeLoyaltyPointsByLoyaltyTypeAndSpending(loyaltyType, purchaseAmount);
-				Transaction transaction = new Transaction(transactionDTO.getTransactionId(),transactionDTO.getPurchaseDate(),transactionDTO.getPurchaseAmount(),loyaltyPoints);
-
-				if(!customerService.addTransaction(customer.getLoyaltyCardNumber(),transaction)){
+				LoyaltyType loyaltyType = loyaltyProgramService.computeBySpending(customer.getCurrentYearTotal() + purchaseAmount);
+				
+				Transaction transaction = createTransaction(loyaltyCardNumber, loyaltyType, transactionDTO);
+				if(transaction == null){
 					continue;
 				}
 				LOGGER.info("New Transaction with Id :"+transaction.getTransactionId()+" added to Customer with Loyalty Card Number"+loyaltyCardNumber);
 				customer.setLoyaltyType(loyaltyType);
-				if(StringUtils.isNotBlank(transactionDTO.getUserName())){
-					customer.setName(transactionDTO.getUserName());
-				}
-				if(StringUtils.isNotBlank(transactionDTO.getUserEmail())){
-					customer.setEmail(transactionDTO.getUserEmail());
-				}
+				updateCustomerInfo(transactionDTO, customer);
 			} catch (Exception e) {
 				LOGGER.error("Exception occurred while processing transaction:"+transactionDTO+". Stacktrace : "+e);
 			}
 		}
+	}
+
+	private void updateCustomerInfo(TransactionDTO transactionDTO, Customer customer) {
+		if(StringUtils.isNotBlank(transactionDTO.getUserName())){
+			customer.setName(transactionDTO.getUserName());
+		}
+		if(StringUtils.isNotBlank(transactionDTO.getUserEmail())){
+			customer.setEmail(transactionDTO.getUserEmail());
+		}
+	}
+	
+	private Transaction createTransaction(Long loyaltyCardNumber, LoyaltyType loyaltyType, TransactionDTO transactionDTO){
+		int loyaltyPoints = loyaltyProgramService.computeLoyaltyPointsByLoyaltyTypeAndSpending(loyaltyType, transactionDTO.getPurchaseAmount());
+		Transaction transaction = new Transaction(transactionDTO.getTransactionId(),transactionDTO.getPurchaseDate(),transactionDTO.getPurchaseAmount(),loyaltyPoints);
+		if(!customerService.addTransaction(loyaltyCardNumber,transaction)){
+			return null;
+		}
+		return transaction;
 	}
 
 }
